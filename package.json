@@ -12,11 +12,6 @@
     "prettier": "prettier --ignore-path .gitignore --config .prettierrc --write src/**/*.ts",
     "prepare": "husky install"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "yarn eslint && yarn prettier"
-    }
-  },
   "author": "Ramon Mostert",
   "license": "ISC",
   "devDependencies": {
