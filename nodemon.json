@@ -1,0 +1,7 @@
+{
+  "signal": "SIGTERM",
+  "watch": ["src/**/*"],
+  "ext": "ts, json, d.ts",
+  "ignore": ["**/*.test.ts", "**/*.spec.ts", ".git", "node_modules"],
+  "exec": "ts-node -r dotenv/config ./src/app.ts"
+}
