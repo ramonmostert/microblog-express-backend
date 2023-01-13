@@ -12,13 +12,13 @@
     "prettier": "prettier --ignore-path .gitignore --config .prettierrc --write src/**/*.ts",
     "prepare": "husky install"
   },
-  "author": "",
-  "license": "ISC",
   "husky": {
     "hooks": {
       "pre-commit": "yarn eslint && yarn prettier"
     }
   },
+  "author": "Ramon Mostert",
+  "license": "ISC",
   "devDependencies": {
     "@types/bcryptjs": "^2.4.2",
     "@types/cookie": "^0.5.1",
