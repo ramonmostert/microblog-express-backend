@@ -9,13 +9,14 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "eslint": "eslint src/**/*.ts",
     "eslint:fix": "eslint src/**/*.ts --fix",
-    "prettier": "prettier --ignore-path .gitignore --config .prettierrc --write src/**/*.ts"
+    "prettier": "prettier --ignore-path .gitignore --config .prettierrc --write src/**/*.ts",
+    "prepare": "husky install"
   },
   "author": "",
   "license": "ISC",
   "husky": {
     "hooks": {
-      "pre-commit": "yarn eslint"
+      "pre-commit": "yarn eslint:fix && yarn prettier"
     }
   },
   "devDependencies": {
@@ -47,6 +48,7 @@
     "dotenv": "^16.0.3",
     "express": "^4.18.2",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^6.8.0"
+    "mongoose": "^6.8.0",
+    "package.json": "^2.0.1"
   }
 }
