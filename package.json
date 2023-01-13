@@ -16,7 +16,7 @@
   "license": "ISC",
   "husky": {
     "hooks": {
-      "pre-commit": "yarn eslint:fix && yarn prettier"
+      "pre-commit": "yarn eslint && yarn prettier"
     }
   },
   "devDependencies": {

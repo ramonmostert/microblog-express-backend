@@ -5,9 +5,10 @@ import jwt from 'jsonwebtoken';
 const checkAuth: RequestHandler = (req: Request, res, next) => {
   const { authToken } = req.cookies;
 
-  if (!authToken) 
+  if (!authToken) {
+  
     return next(new HttpError("Couldn't find authorization token", 401));
-  }
+  
 
   try {
     const decodedToken = jwt.verify(authToken, process.env.JWT_SECRET) as JwtPayload;
