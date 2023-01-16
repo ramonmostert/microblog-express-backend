@@ -31,7 +31,7 @@ userSchema.methods.generateAuthToken = function (): string {
 
 userSchema.methods.generateRefreshToken = function (): string {
   const token = jwt.sign({ id: this._id, email: this.email }, process.env.JWT_REFRESH_SECRET, {
-    expiresIn: `${parseInt(process.env.JWT_EXPIRES_IN)}m`,
+    expiresIn: `${parseInt(process.env.JWT_REFRESH_EXPIRES_IN)}m`,
   });
 
   return token;

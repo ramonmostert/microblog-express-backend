@@ -43,15 +43,14 @@ export const findById: RequestHandler = async (req, res, next) => {
   const { id } = req.params as { id: string };
 
   let post;
-
   try {
-    post = await Post.findById(id);
+    post = await Post.findById(id).populate('user', 'name, _id');
   } catch (error) {
     return next(new HttpError((error as Error).message, 500));
   }
 
   if (!post) {
-    return next(new HttpError('no game', 401));
+    return next(new HttpError('post not found', 401));
   }
 
   res.json({ post: post.toObject({ getters: true }) });
