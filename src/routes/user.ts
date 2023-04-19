@@ -1,15 +1,26 @@
 import { Router } from 'express';
-// import checkAuth from '../middleware/check-auth';
-
-import { login, signup, signout, refresh } from '../controllers/user';
+import checkAuth from '../middleware/check-auth';
+import upload from '../middleware/upload';
+import { login, signup, signout, refresh, updateAvatar, me } from '../controllers/user';
+import { check } from 'express-validator';
 
 const router = Router();
 
-router.post('/login', login);
-router.post('/signup', signup);
-router.post('/signout', signout);
-router.post('/refresh', refresh);
+const checkSignup = [
+  check('email').not().isEmpty().isEmail(),
+  check('name').not().isEmpty(),
+  check('password').not().isEmpty(),
+  check('repeatPassword').not().isEmpty(),
+];
 
-// router.use(checkAuth);
+const checkLogin = [check('email').not().isEmpty()];
+
+router.post('/login', checkLogin, upload.none(), login);
+router.post('/signup', checkSignup, upload.none(), signup);
+router.post('/signout', upload.none(), signout);
+router.post('/refresh', upload.none(), refresh);
+
+router.post('/updateAvatar', checkAuth, upload.single('image'), updateAvatar);
+router.post('/me', checkAuth, upload.none(), me);
 
 export default router;

@@ -5,8 +5,19 @@ export interface UserDocument extends Document {
   email: string;
   name: string;
   password: string;
+  avatar: string;
+  createdAt: Date;
+  updatedAt?: Date;
   generateAuthToken: () => string;
   generateRefreshToken: () => string;
+  toResultJSON: () => UserResultJSON;
+}
+
+export interface UserResultJSON {
+  id: string;
+  email: string;
+  avatar: string;
+  name: string;
 }
 
 export type UserModel = Model<UserDocument>;
@@ -15,6 +26,7 @@ const userSchema: Schema = new Schema<UserDocument, Model<UserDocument>>({
   email: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   password: { type: String },
+  avatar: { type: String, required: false },
 });
 
 userSchema.methods.comparePassword = function (password: string): boolean {
@@ -35,6 +47,15 @@ userSchema.methods.generateRefreshToken = function (): string {
   });
 
   return token;
+};
+
+userSchema.methods.toResultJSON = function (): UserResultJSON {
+  return {
+    id: this._id,
+    name: this.name,
+    email: this.email,
+    avatar: this.avatar,
+  };
 };
 
 const User = model<UserDocument, UserModel>('User', userSchema);

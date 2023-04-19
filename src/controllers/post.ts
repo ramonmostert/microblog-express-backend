@@ -1,24 +1,30 @@
 import { RequestHandler } from 'express';
 import HttpError from '../models/http-error';
 import Post from '../models/post';
-import type { PostDocument } from '../models/post';
+import { validationResult } from 'express-validator';
 
 export const list: RequestHandler = async (req, res, next) => {
   try {
-    const [count, posts] = await Promise.all([Post.count(), Post.find().populate('user', 'name').sort({ createdAt: 'desc' })]);
+    const [count, posts] = await Promise.all([Post.count(), Post.find().populate('user', ['avatar', 'name']).sort({ createdAt: 'desc' })]);
 
     if (!posts) {
       return next(new HttpError('Fetching games failed', 404));
     }
 
-    const postsResult = posts.map((post) => post.toObject({ getters: true }));
+    const postsResult = posts.map((post) => post.toResultJSON());
     res.json({ posts: postsResult, count });
   } catch (error) {
     return next(new HttpError((error as Error).message, 500));
   }
 };
 
-export const add: RequestHandler<PostDocument> = async (req, res, next) => {
+export const add: RequestHandler = async (req, res, next) => {
+  const validation = validationResult(req);
+
+  if (!validation.isEmpty()) {
+    return res.status(422).json({ errors: validation.array() });
+  }
+
   const { title, content } = req.body;
 
   const post = new Post({
@@ -34,17 +40,17 @@ export const add: RequestHandler<PostDocument> = async (req, res, next) => {
     return next(new HttpError((error as Error).message, 500));
   }
 
-  if (!post) return next(new HttpError('Could not add game', 500));
-  const populated = await post.populate('user', 'name');
+  if (!post) return next(new HttpError('Failed adding post', 500));
+  const populated = await post.populate('user', ['name', 'avatar']);
   res.json({ post: populated.toObject({ getters: true }) });
 };
 
 export const findById: RequestHandler = async (req, res, next) => {
-  const { id } = req.params as { id: string };
+  const { id } = req.params;
 
   let post;
   try {
-    post = await Post.findById(id).populate('user', 'name, _id');
+    post = await Post.findById(id).populate('user', 'name, _id').populate('user', ['avatar', 'name']);
   } catch (error) {
     return next(new HttpError((error as Error).message, 500));
   }
@@ -57,11 +63,14 @@ export const findById: RequestHandler = async (req, res, next) => {
 };
 
 export const update: RequestHandler = async (req, res, next) => {
-  const { id, title, content } = req.body as {
-    id: string;
-    title: string;
-    content: string;
-  };
+  const validation = validationResult(req);
+
+  if (!validation.isEmpty()) {
+    return res.status(422).json({ errors: validation.array() });
+  }
+
+  const { id } = req.params;
+  const { title, content } = req.body;
 
   let post;
 
@@ -82,7 +91,7 @@ export const update: RequestHandler = async (req, res, next) => {
   let updatedPost;
 
   try {
-    updatedPost = await Post.updateOne({ _id: id }, { title, content });
+    updatedPost = await Post.updateOne({ _id: id }, { title, content, updatedAt: new Date().toLocaleString() });
   } catch (error) {
     return next(new HttpError((error as Error).message, 500));
   }

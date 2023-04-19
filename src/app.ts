@@ -6,7 +6,8 @@ import mongoose from 'mongoose';
 import HttpError from './models/http-error';
 import cors, { CorsOptions } from 'cors';
 import cookieParser from 'cookie-parser';
-
+import fs from 'fs';
+import path from 'path';
 const allowedOrigins = ['http://localhost:5173'];
 
 if (!process.env.MONGODB_URL) {
@@ -17,6 +18,8 @@ const app = express();
 
 app.use(bodyParser.json());
 app.use(cookieParser());
+
+app.use('/static', express.static(path.join('./static')));
 
 // cors
 const corsOptions: CorsOptions = {
@@ -50,6 +53,11 @@ app.use('/user', userRoutes);
 
 // global error handling
 app.use((error: HttpError, req: Request, res: Response, next: NextFunction) => {
+  if (req.file) {
+    fs.unlink(req.file.path, (err) => {
+      console.log(err);
+    });
+  }
   if (res.headersSent) {
     return next(error);
   }
@@ -62,6 +70,7 @@ mongoose
   .connect(process.env.MONGODB_URL)
   .then(() => {
     app.listen(process.env.PORT);
+    console.log('listening');
   })
   .catch((error) => {
     console.log(error);
